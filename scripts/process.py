@@ -23,6 +23,9 @@ COURSES_URL      = f"https://docs.google.com/spreadsheets/d/{COURSES_SHEET_ID}/e
 
 EARLY_KEYWORDS = ("early chance", "extra chance", "alternative track")
 
+# Current academic year — used to filter the master courses sheet by "Period"
+ACADEMIC_YEAR = "2026-2027"
+
 # Aliases: master-sheet course name → dashboard display name.
 # Use when two official courses share one combined dashboard row.
 COURSE_ALIASES = {
@@ -66,14 +69,26 @@ def parse_courses(text):
         print(f"WARNING: no SM column found in {headers}", file=sys.stderr)
         return None   # None = skip filtering entirely
 
-    print(f"Using columns -> name: '{name_col}', sm: '{sm_col}'")
+    # Find the Period column for academic-year filtering
+    period_col = next(
+        (h for h in headers if h.strip().lower() in ("period", "academic year", "year")),
+        None
+    )
+    print(f"Using columns -> name: '{name_col}', sm: '{sm_col}', period: '{period_col}'")
 
     course_sm = {}
     for row in reader:
-        raw_name = (row.get(name_col) or "").strip()
-        raw_sm   = (row.get(sm_col)   or "").strip()
+        raw_name   = (row.get(name_col)    or "").strip()
+        raw_sm     = (row.get(sm_col)      or "").strip()
+        raw_period = (row.get(period_col)  or "").strip() if period_col else ""
+
         if not raw_name:
             continue
+
+        # Only include courses for the current academic year
+        if period_col and raw_period and raw_period != ACADEMIC_YEAR:
+            continue
+
         display_name = COURSE_ALIASES.get(raw_name, raw_name)
         try:
             sm_f = float(raw_sm)
