@@ -12,12 +12,23 @@ import csv, json, re, sys, urllib.request, datetime
 from io import StringIO
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
-# The "export" URL works server-side (no CORS); keep the sheet shared as
-# "Anyone with the link → Viewer".
+# Curriculum activities sheet (source of teach/exam/retake data)
 SHEET_ID = "1yC2wcen3-uWT2Ax58Tpr64Kr4LqKeR835gnMQD11HoE"
 CSV_URL  = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid=0"
 
+# Master courses sheet (whitelist of real courses + SM grouping)
+COURSES_SHEET_ID = "1mhZCbj-UOnfY_0NkQAEJC-_HGrPXPh4nyVDIMqXBDN8"
+COURSES_GID      = "1788765045"
+COURSES_URL      = f"https://docs.google.com/spreadsheets/d/{COURSES_SHEET_ID}/export?format=csv&gid={COURSES_GID}"
+
 EARLY_KEYWORDS = ("early chance", "extra chance", "alternative track")
+
+# Aliases: master-sheet course name → dashboard display name.
+# Use when two official courses share one combined dashboard row.
+COURSE_ALIASES = {
+    "Assessment 3":    "Assessment & Interventions 3",
+    "Interventions 3": "Assessment & Interventions 3",
+}
 
 # ── FETCH ─────────────────────────────────────────────────────────────────────
 def fetch_csv(url):
@@ -26,8 +37,54 @@ def fetch_csv(url):
     with urllib.request.urlopen(req, timeout=30) as r:
         return r.read().decode("utf-8")
 
+# ── PARSE COURSES MASTER ───────────────────────────────────────────────────────
+def parse_courses(text):
+    """Return dict: display_course_name -> sm (int 1-6, or 0 if unknown)."""
+    reader = csv.DictReader(StringIO(text))
+    headers = reader.fieldnames or []
+    print(f"Courses sheet headers: {headers}")
+
+    # Find the course-name column (try several likely names)
+    name_col = next(
+        (h for h in headers
+         if h.strip().lower() in ("course", "coursename", "name", "vak", "module")),
+        None
+    )
+    # Find the SM column ("SM 3-yr" as specified in the sheet)
+    sm_col = next(
+        (h for h in headers
+         if h.strip().lower() in ("sm 3-yr", "sm 3yr", "sm3-yr", "sm", "semester")),
+        None
+    )
+
+    if not name_col:
+        print(f"WARNING: no course-name column found in {headers}", file=sys.stderr)
+        return {}
+    if not sm_col:
+        print(f"WARNING: no SM column found in {headers}", file=sys.stderr)
+        return {}
+
+    print(f"Using columns -> name: '{name_col}', sm: '{sm_col}'")
+
+    course_sm = {}
+    for row in reader:
+        raw_name = (row.get(name_col) or "").strip()
+        raw_sm   = (row.get(sm_col)   or "").strip()
+        if not raw_name:
+            continue
+        display_name = COURSE_ALIASES.get(raw_name, raw_name)
+        try:
+            sm = int(float(raw_sm))   # handles "3" or "3.0"
+        except (ValueError, TypeError):
+            sm = 0
+        if display_name not in course_sm:
+            course_sm[display_name] = sm
+
+    print(f"Parsed {len(course_sm)} courses from master sheet")
+    return course_sm
+
 # ── PROCESS ───────────────────────────────────────────────────────────────────
-def process(text):
+def process(text, course_sm=None):
     reader = csv.DictReader(StringIO(text))
     data = {}
 
@@ -40,6 +97,11 @@ def process(text):
 
         if not course or aud != "Student" or not cw_raw or cw_raw == "-":
             continue
+
+        # Filter: if we have a whitelist, skip anything not on it
+        if course_sm is not None and course not in course_sm:
+            continue
+
         try:
             cw = int(cw_raw)
         except ValueError:
@@ -49,7 +111,11 @@ def process(text):
             continue
 
         if course not in data:
-            data[course] = {"teach": set(), "exam": set(), "retake": set(), "early": set(), "acts": {}}
+            sm = course_sm.get(course, 0) if course_sm else 0
+            data[course] = {
+                "teach": set(), "exam": set(), "retake": set(),
+                "early": set(), "acts": {}, "sm": sm
+            }
 
         data[course]["acts"].setdefault(str(cw), [])
         if act:
@@ -65,7 +131,7 @@ def process(text):
         elif dtype == "EXAM":
             (data[course]["early"] if is_early else data[course]["exam"]).add(cw)
 
-    # Convert sets → sorted lists for JSON serialisation
+    # Convert sets -> sorted lists for JSON serialisation
     return {
         course: {
             "teach":  sorted(d["teach"]),
@@ -73,6 +139,7 @@ def process(text):
             "retake": sorted(d["retake"]),
             "early":  sorted(d["early"]),
             "acts":   d["acts"],
+            "sm":     d["sm"],
         }
         for course, d in data.items()
     }
@@ -101,7 +168,8 @@ def embed(data, html_path="index.html"):
         "      exam:   new Set(d.exam),\n"
         "      retake: new Set(d.retake),\n"
         "      early:  new Set(d.early),\n"
-        "      acts:   d.acts\n"
+        "      acts:   d.acts,\n"
+        "      sm:     d.sm || 0\n"
         "    };\n"
         "  }\n"
         "\n"
@@ -130,7 +198,7 @@ def embed(data, html_path="index.html"):
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html)
 
-    print(f"✅ Embedded {n} courses (built {today}) → {html_path}")
+    print(f"Embedded {n} courses (built {today}) -> {html_path}")
 
 # ── MAIN ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
@@ -139,6 +207,18 @@ if __name__ == "__main__":
                 if os.path.basename(os.path.dirname(os.path.abspath(__file__))) == "scripts" \
                 else "index.html"
 
+    # 1. Fetch the master courses list (whitelist + SM grouping)
+    try:
+        courses_text = fetch_csv(COURSES_URL)
+        course_sm    = parse_courses(courses_text)
+    except Exception as e:
+        print(f"WARNING: could not fetch master courses sheet: {e}", file=sys.stderr)
+        print("Continuing without course filter — all activities will be shown.")
+        course_sm = None
+
+    # 2. Fetch curriculum activities and process
     text = fetch_csv(CSV_URL)
-    data = process(text)
+    data = process(text, course_sm)
+
+    # 3. Embed into index.html
     embed(data, html_path)
