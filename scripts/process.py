@@ -74,7 +74,8 @@ def parse_courses(text):
             continue
         display_name = COURSE_ALIASES.get(raw_name, raw_name)
         try:
-            sm = int(float(raw_sm))   # handles "3" or "3.0"
+            sm_f = float(raw_sm)
+            sm = int(sm_f) if sm_f == int(sm_f) else sm_f  # keep 2.5 / 4.5 as-is
         except (ValueError, TypeError):
             sm = 0
         if display_name not in course_sm:
@@ -94,6 +95,7 @@ def process(text, course_sm=None):
         aud     = (row.get("AudienceLevel") or "").strip()
         dtype   = (row.get("DisplayType") or "").strip()
         cw_raw  = (row.get("CalendarWeek") or "").strip()
+        sm_raw  = (row.get("SM") or "").strip()
 
         if not course or aud != "Student" or not cw_raw or cw_raw == "-":
             continue
@@ -111,7 +113,12 @@ def process(text, course_sm=None):
             continue
 
         if course not in data:
-            sm = course_sm.get(course, 0) if course_sm else 0
+            # SM from the activities row (e.g. 1, 2, 2.5, 3, 4, 4.5, 5, 6)
+            try:
+                sm_f = float(sm_raw)
+                sm = int(sm_f) if sm_f == int(sm_f) else sm_f
+            except (ValueError, TypeError):
+                sm = course_sm.get(course, 0) if course_sm else 0
             data[course] = {
                 "teach": set(), "exam": set(), "retake": set(),
                 "early": set(), "acts": {}, "sm": sm
