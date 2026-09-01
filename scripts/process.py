@@ -41,13 +41,15 @@ def fetch_csv(url):
 def parse_courses(text):
     """Return dict: display_course_name -> sm (int 1-6, or 0 if unknown)."""
     reader = csv.DictReader(StringIO(text))
+    if reader.fieldnames:
+        reader.fieldnames = [f.strip().lstrip('﻿') for f in reader.fieldnames]
     headers = reader.fieldnames or []
     print(f"Courses sheet headers: {headers}")
 
     # Find the course-name column (try several likely names)
     name_col = next(
         (h for h in headers
-         if h.strip().lower() in ("course", "coursename", "name", "vak", "module")),
+         if h.strip().lower() in ("course name", "course", "coursename", "name", "vak", "module")),
         None
     )
     # Find the SM column ("SM 3-yr" as specified in the sheet)
