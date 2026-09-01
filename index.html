@@ -1,0 +1,837 @@
+<title>ESP Curriculum 2026–27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:           #EFF2F8;
+  --surface:      #FFFFFF;
+  --surface-sub:  #F4F6FB;
+  --border:       #D2DAE8;
+  --border-lt:    #E5EAF4;
+  --border-str:   #B5C2D6;
+  --text-1:       #1A2238;
+  --text-2:       #54618A;
+  --text-3:       #8A97B5;
+  --blue:         #2C5ECC;
+  --blue-lt:      #EAF0FC;
+  --c-teach:      #4178E0;
+  --c-exam:       #1A2238;
+  --c-retake:     #7E93B0;
+  --c-early:      #D97706;
+  --sem1-hdr:     #2C5ECC;
+  --sem2-hdr:     #5A4BB5;
+  --sum-hdr:      #2A7A5A;
+  --shadow:       0 1px 3px rgba(26,34,56,.07), 0 4px 18px rgba(26,34,56,.06);
+  --r:            8px;
+  --cw:           18px;  /* cell width */
+  --ch:           24px;  /* cell height */
+  --name-col:     208px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:          #0C1422;
+    --surface:     #152032;
+    --surface-sub: #1B2A40;
+    --border:      #243248;
+    --border-lt:   #1B2840;
+    --border-str:  #3A4E68;
+    --text-1:      #DDE5F4;
+    --text-2:      #7E90B4;
+    --text-3:      #48597A;
+    --blue:        #5580EC;
+    --blue-lt:     #182040;
+    --c-teach:     #5580EC;
+    --c-exam:      #DDE5F4;
+    --c-retake:    #48597A;
+    --c-early:     #F59E0B;
+    --sem1-hdr:    #3568E0;
+    --sem2-hdr:    #6055C0;
+    --sum-hdr:     #2A8A60;
+    --shadow:      0 1px 3px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"] {
+  --bg:          #0C1422;
+  --surface:     #152032;
+  --surface-sub: #1B2A40;
+  --border:      #243248;
+  --border-lt:   #1B2840;
+  --border-str:  #3A4E68;
+  --text-1:      #DDE5F4;
+  --text-2:      #7E90B4;
+  --text-3:      #48597A;
+  --blue:        #5580EC;
+  --blue-lt:     #182040;
+  --c-teach:     #5580EC;
+  --c-exam:      #DDE5F4;
+  --c-retake:    #48597A;
+  --c-early:     #F59E0B;
+  --sem1-hdr:    #3568E0;
+  --sem2-hdr:    #6055C0;
+  --sum-hdr:     #2A8A60;
+  --shadow:      0 1px 3px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.25);
+}
+
+/* ── RESET ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Figtree', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ── TOP BAR ─────────────────────────────────────────────── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 1px 0 var(--border), 0 2px 10px rgba(26,34,56,.06);
+}
+
+.brand { display: flex; flex-direction: column; gap: 1px; }
+.brand h1 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -.015em;
+  color: var(--text-1);
+  line-height: 1.2;
+}
+.brand .year {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+  letter-spacing: .04em;
+}
+
+.divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+.ls-teach { width: 13px; height: 13px; background: var(--c-teach); border-radius: 2px; flex-shrink: 0; }
+.ls-exam  { width: 9px; height: 9px; background: var(--c-exam); border-radius: 50%; flex-shrink: 0; }
+.ls-retake { width: 9px; height: 9px; border: 1.5px solid var(--c-retake); border-radius: 50%; flex-shrink: 0; }
+.ls-early {
+  width: 8px; height: 8px;
+  background: var(--c-early);
+  border-radius: 1px;
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+.search-input {
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: inherit;
+  font-size: 12px;
+  width: 150px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-lt); }
+.search-input::placeholder { color: var(--text-3); }
+
+.sync-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+  padding: 4px 9px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  white-space: nowrap;
+  letter-spacing: .02em;
+  background: none;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.sync-chip:hover { border-color: var(--blue); background: var(--blue-lt); }
+.sync-chip:disabled { opacity: .6; cursor: default; }
+.sync-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #F59E0B;
+  flex-shrink: 0;
+  transition: background .4s;
+}
+.sync-dot.live  { background: #22C55E; }
+.sync-dot.error { background: #EF4444; }
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+.sync-dot.loading { animation: blink .9s ease infinite; }
+
+/* ── MAIN ────────────────────────────────────────────────── */
+.main { padding: 18px 20px; }
+
+.gantt-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.gantt-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── TABLE ───────────────────────────────────────────────── */
+.gtable {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+}
+
+/* Sticky first column */
+.gtable th:first-child,
+.gtable td.td-name {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+}
+.gtable thead th:first-child { z-index: 10; }
+
+/* ── HEADER ROWS ─────────────────────────────────────────── */
+
+/* Corner cell (spans 3 header rows) */
+.th-corner {
+  width: var(--name-col);
+  min-width: var(--name-col);
+  background: var(--surface-sub);
+  border-right: 2px solid var(--border-str);
+  border-bottom: 1px solid var(--border);
+  padding: 5px 12px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  vertical-align: bottom;
+}
+
+/* Semester band */
+.th-sem {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: #fff;
+  text-align: center;
+  padding: 5px 2px;
+  border-right: 1px solid rgba(255,255,255,.2);
+  border-bottom: 1px solid rgba(0,0,0,.12);
+}
+.th-sem.s1 { background: var(--sem1-hdr); }
+.th-sem.s2 { background: var(--sem2-hdr); }
+.th-sem.ss { background: var(--sum-hdr); }
+
+/* Month label */
+.th-month {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  text-align: center;
+  background: var(--surface-sub);
+  padding: 4px 0;
+  border-right: 1px solid var(--border-lt);
+  border-bottom: 1px solid var(--border-lt);
+  white-space: nowrap;
+}
+
+/* Week number */
+.th-wk {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5px;
+  font-weight: 400;
+  color: var(--text-3);
+  text-align: center;
+  background: var(--surface-sub);
+  padding: 2px 0 4px;
+  border-right: 1px solid var(--border-lt);
+  border-bottom: 2px solid var(--border);
+  width: var(--cw);
+  min-width: var(--cw);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Strong right border after break weeks */
+.br { border-right: 2px solid var(--border-str) !important; }
+
+/* ── BODY ROWS ───────────────────────────────────────────── */
+
+/* Year group row */
+.tr-group td {
+  background: var(--surface-sub);
+  padding: 5px 12px;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.tr-group .td-name { border-right: 2px solid var(--border-str); }
+
+/* Course row */
+.tr-course { transition: background .1s; }
+.tr-course:hover { background: rgba(65,120,224,.04); }
+
+/* Course name cell */
+.td-name {
+  width: var(--name-col);
+  min-width: var(--name-col);
+  max-width: var(--name-col);
+  height: var(--ch);
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-right: 2px solid var(--border-str);
+  border-bottom: 1px solid var(--border-lt);
+  background: var(--surface);
+  cursor: default;
+  transition: color .1s, background .1s;
+  vertical-align: middle;
+}
+.tr-course:hover .td-name {
+  color: var(--blue);
+  background: color-mix(in srgb, var(--surface) 93%, var(--c-teach) 7%);
+}
+
+/* Week cell */
+.td-wk {
+  width: var(--cw);
+  min-width: var(--cw);
+  height: var(--ch);
+  padding: 0;
+  border-right: 1px solid var(--border-lt);
+  border-bottom: 1px solid var(--border-lt);
+  position: relative;
+  vertical-align: middle;
+  text-align: center;
+  cursor: default;
+}
+.td-wk:hover { background: rgba(65,120,224,.06); }
+
+/* Inner square */
+.ci {
+  display: block;
+  width: calc(var(--cw) - 4px);
+  height: calc(var(--ch) - 6px);
+  border-radius: 2px;
+  margin: 0 auto;
+  position: relative;
+}
+.ci.teach { background: var(--c-teach); opacity: .87; }
+
+/* Markers */
+.mk {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+}
+.mk-exam {
+  width: 7px; height: 7px;
+  background: var(--c-exam);
+  transform: translate(-50%,-50%);
+}
+.teach .mk-exam {
+  background: rgba(255,255,255,.92);
+  width: 6px; height: 6px;
+}
+.mk-retake {
+  width: 7px; height: 7px;
+  background: transparent;
+  border: 1.5px solid var(--c-retake);
+  transform: translate(-50%,-50%);
+}
+.teach .mk-retake { border-color: rgba(255,255,255,.6); }
+.mk-early {
+  width: 7px; height: 7px;
+  background: var(--c-early);
+  border-radius: 1px;
+  transform: translate(-50%,-50%) rotate(45deg);
+}
+
+/* ── TOOLTIP ─────────────────────────────────────────────── */
+#tip {
+  position: fixed;
+  background: var(--text-1);
+  color: var(--surface);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'Figtree', sans-serif;
+  pointer-events: none;
+  z-index: 9999;
+  max-width: 260px;
+  line-height: 1.55;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  opacity: 0;
+  transition: opacity .1s;
+}
+#tip.on { opacity: 1; }
+#tip .tip-head {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  opacity: .65;
+  margin-bottom: 2px;
+  display: block;
+  letter-spacing: .03em;
+}
+#tip .tip-act { font-size: 10.5px; }
+
+/* ── STATES ──────────────────────────────────────────────── */
+.state-wrap {
+  padding: 56px 24px;
+  text-align: center;
+}
+.spinner {
+  width: 26px; height: 26px;
+  border: 2px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin .75s linear infinite;
+  margin: 0 auto 14px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; border-top-color: var(--border); }
+}
+.state-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: .03em;
+}
+.err-head { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+.err-body {
+  font-size: 12px;
+  color: var(--text-2);
+  max-width: 380px;
+  margin: 0 auto 8px;
+  line-height: 1.7;
+}
+.err-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+  margin-top: 6px;
+}
+</style>
+
+<!-- ─────────────────────────────────── TOP BAR ─── -->
+<div class="topbar">
+  <div class="brand">
+    <h1>ESP Curriculum Design</h1>
+    <span class="year">Academic Year 2026–2027</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="legend">
+    <div class="li"><span class="ls-teach"></span>Teaching</div>
+    <div class="li"><span class="ls-exam"></span>Exam</div>
+    <div class="li"><span class="ls-retake"></span>Retake</div>
+    <div class="li"><span class="ls-early"></span>Early / extra</div>
+  </div>
+
+  <div class="topbar-right">
+    <input class="search-input" id="searchInput" type="search" placeholder="Filter courses…" autocomplete="off">
+    <button class="sync-chip" id="syncChip" onclick="load()" title="Refresh data from Google Sheets">
+      <div class="sync-dot loading" id="syncDot"></div>
+      <span id="syncLabel">Loading…</span>
+      <span id="syncRefreshIcon" style="margin-left:3px;opacity:.5;font-size:10px;display:none">&#8635;</span>
+    </button>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────── MAIN ─── -->
+<div class="main">
+  <div class="gantt-card">
+    <div class="gantt-scroll" id="ganttScroll">
+      <div class="state-wrap">
+        <div class="spinner"></div>
+        <div class="state-label">Loading…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────
+const SHEET_ID  = '1yC2wcen3-uWT2Ax58Tpr64Kr4LqKeR835gnMQD11HoE';
+const CSV_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pub?output=csv&gid=0`;
+
+// Academic year week sequence: CW36-52 (2026) → CW1-35 (2027) incl. CW53
+const WEEKS = [
+  ...Array.from({length: 17}, (_, i) => i + 36),
+  53,
+  ...Array.from({length: 35}, (_, i) => i + 1)
+];
+
+// Stronger divider after Christmas/New Year (52) and Summer start (26)
+const BREAK_AFTER = new Set([52, 26]);
+
+// Week → month name
+const W2M = {};
+[
+  ['Sep', [36,37,38,39]],
+  ['Oct', [40,41,42,43,44]],
+  ['Nov', [45,46,47,48]],
+  ['Dec', [49,50,51,52,53]],
+  ['Jan', [1,2,3,4]],
+  ['Feb', [5,6,7,8,9]],
+  ['Mar', [10,11,12,13]],
+  ['Apr', [14,15,16,17]],
+  ['May', [18,19,20,21,22]],
+  ['Jun', [23,24,25,26]],
+  ['Jul', [27,28,29,30,31]],
+  ['Aug', [32,33,34,35]],
+].forEach(([m, ws]) => ws.forEach(w => W2M[w] = m));
+
+// Semester classification
+const SEM1   = new Set([36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53]);
+const SEM2   = new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]);
+// Summer = 27-35
+
+// Preferred curriculum order
+const CURRICULUM = [
+  ['Year 1', [
+    'Anatomy 1','Physiology 1','Assessment 1','Psychology 1','Pathology 1',
+    'EBP 1','Biomechanics 1','Applied Anatomy 1','Interventions 1','Clinimetrics 1',
+    'Concepts Clinical Reasoning 1','Case Study 1','SCP 1','Elective Credits 1'
+  ]],
+  ['Year 2', [
+    'Anatomy 2','Biomechanics 2','EBP 2','Neurology 1','Physiology 2',
+    'Clinimetrics 2','Assessment 2','Interventions 2','Case Study 2',
+    'Concepts Clinical Reasoning 2','Elective Credits 2','SCP 2',
+    'Internship 1','Internship 1 - Internship','Internship 1 - Report'
+  ]],
+  ['Year 3', [
+    'EBP 3','Neurology 2','Pathology 2','Physiology 3','Biomechanics 3',
+    'Interventions 3','Concepts Clinical Reasoning 3',
+    'Case Study 3','SCP 3','Elective Credits 3',
+    'Internship 2','Internship 2 - Internship','Internship 2 - Report'
+  ]],
+  ['Year 4', [
+    'EBP 4','Ethics','Entrepreneurship','MPH','SCP 4','Elective Credits 4',
+    'Internship 3','Internship 3 - Internship','Internship 3 - Report',
+    'Internship 4','Internship 4 - Internship','Internship 4 - Report'
+  ]],
+];
+
+// ── CSV PARSER ────────────────────────────────────────────
+function parseCSV(text) {
+  const rows = [];
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    const row = [];
+    let inQ = false, cell = '';
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQ && line[i+1] === '"') { cell += '"'; i++; }
+        else inQ = !inQ;
+      } else if (c === ',' && !inQ) {
+        row.push(cell); cell = '';
+      } else cell += c;
+    }
+    row.push(cell);
+    rows.push(row);
+  }
+  return rows;
+}
+
+// ── DATA PROCESSING ───────────────────────────────────────
+function processData(rows) {
+  if (!rows.length) return {};
+  const hdr = rows[0].map(h => h.trim());
+  const idx = name => hdr.indexOf(name);
+  const iCourse  = idx('Course');
+  const iAct     = idx('ActivityName');
+  const iAud     = idx('AudienceLevel');
+  const iDType   = idx('DisplayType');
+  const iCW      = idx('CalendarWeek');
+
+  const data = {};
+
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    const course = (row[iCourse] || '').trim();
+    const actName = (row[iAct] || '').trim();
+    const aud    = (row[iAud]   || '').trim();
+    const dtype  = (row[iDType] || '').trim();
+    const cwRaw  = (row[iCW]    || '').trim();
+
+    if (!course || aud !== 'Student' || !cwRaw || cwRaw === '-') continue;
+    const cw = parseInt(cwRaw, 10);
+    if (isNaN(cw)) continue;
+
+    if (!data[course]) {
+      data[course] = { teach: new Set(), exam: new Set(), retake: new Set(), early: new Set(), acts: {} };
+    }
+
+    if (!data[course].acts[cw]) data[course].acts[cw] = [];
+    if (actName) data[course].acts[cw].push(actName);
+
+    const nl = actName.toLowerCase();
+    const isEarly = nl.includes('early chance') || nl.includes('extra chance') || nl.includes('alternative track');
+
+    if      (dtype === 'TEACH')  data[course].teach.add(cw);
+    else if (dtype === 'RETAKE') data[course].retake.add(cw);
+    else if (dtype === 'EXAM')   (isEarly ? data[course].early : data[course].exam).add(cw);
+  }
+  return data;
+}
+
+// ── BUILD ORDERED LIST ────────────────────────────────────
+function orderedList(data) {
+  const items = [], seen = new Set();
+  for (const [year, courses] of CURRICULUM) {
+    const found = courses.filter(c => data[c]);
+    if (!found.length) continue;
+    items.push({ g: true, label: year });
+    found.forEach(c => { items.push({ g: false, name: c }); seen.add(c); });
+  }
+  const rest = Object.keys(data).filter(c => !seen.has(c)).sort();
+  if (rest.length) {
+    items.push({ g: true, label: 'Other Courses' });
+    rest.forEach(c => items.push({ g: false, name: c }));
+  }
+  return items;
+}
+
+// ── HEADER BUILDER ────────────────────────────────────────
+function buildHeader() {
+  // Compute spans
+  const semSpans = [], monthSpans = [];
+  let cSem = '', cSemN = 0, cMonth = '', cMonthN = 0;
+
+  for (const w of WEEKS) {
+    const sem   = SEM1.has(w) ? 's1' : SEM2.has(w) ? 's2' : 'ss';
+    const month = W2M[w] || '?';
+    if (sem   !== cSem)   { if (cSem)   semSpans.push([cSem, cSemN]);     cSem = sem;     cSemN = 1; }   else cSemN++;
+    if (month !== cMonth) { if (cMonth) monthSpans.push([cMonth, cMonthN]); cMonth = month; cMonthN = 1; } else cMonthN++;
+  }
+  if (cSem)   semSpans.push([cSem, cSemN]);
+  if (cMonth) monthSpans.push([cMonth, cMonthN]);
+
+  const SEM_NAMES = { s1: 'Semester 1', s2: 'Semester 2', ss: 'Summer' };
+
+  let h = '';
+
+  // Row 1: semester
+  h += '<tr>';
+  h += `<th class="th-corner" rowspan="3">Course</th>`;
+  for (const [cls, n] of semSpans) {
+    h += `<th class="th-sem ${cls}" colspan="${n}">${SEM_NAMES[cls]}</th>`;
+  }
+  h += '</tr>';
+
+  // Row 2: months
+  h += '<tr>';
+  for (const [month, n] of monthSpans) {
+    h += `<th class="th-month" colspan="${n}">${month}</th>`;
+  }
+  h += '</tr>';
+
+  // Row 3: week numbers
+  h += '<tr>';
+  for (const w of WEEKS) {
+    h += `<th class="th-wk${BREAK_AFTER.has(w) ? ' br' : ''}">${w}</th>`;
+  }
+  h += '</tr>';
+
+  return h;
+}
+
+// ── ROW BUILDER ───────────────────────────────────────────
+function buildRow(name, d) {
+  let h = `<tr class="tr-course" data-name="${x(name)}">`;
+  h += `<td class="td-name" title="${x(name)}">${x(name)}</td>`;
+
+  for (const w of WEEKS) {
+    const teach  = d.teach.has(w);
+    const exam   = d.exam.has(w);
+    const retake = d.retake.has(w);
+    const early  = d.early.has(w);
+    const acts   = (d.acts[w] || []).join(' · ');
+    const tipKey = x(`W${w} · ${name}${acts ? '\n' + acts : ''}`);
+
+    let markers = '';
+    if (exam)   markers += '<span class="mk mk-exam"></span>';
+    if (retake) markers += '<span class="mk mk-retake"></span>';
+    if (early)  markers += '<span class="mk mk-early"></span>';
+
+    h += `<td class="td-wk${BREAK_AFTER.has(w) ? ' br' : ''}" data-tip="${tipKey}" onmouseenter="ts(event)" onmouseleave="th()">`;
+    h += `<span class="ci${teach ? ' teach' : ''}">${markers}</span>`;
+    h += '</td>';
+  }
+
+  h += '</tr>';
+  return h;
+}
+
+// ── RENDER ────────────────────────────────────────────────
+let _data = {};
+
+function render(data) {
+  _data = data;
+  const items = orderedList(data);
+  let html = `<table class="gtable"><thead>${buildHeader()}</thead><tbody>`;
+
+  for (const item of items) {
+    if (item.g) {
+      html += `<tr class="tr-group"><td class="td-name" colspan="${WEEKS.length + 1}">${item.label}</td></tr>`;
+    } else {
+      const d = data[item.name];
+      if (d) html += buildRow(item.name, d);
+    }
+  }
+
+  html += '</tbody></table>';
+  document.getElementById('ganttScroll').innerHTML = html;
+  applySearch();
+}
+
+// ── SEARCH ────────────────────────────────────────────────
+let _q = '';
+function applySearch() {
+  const q = _q.toLowerCase();
+  const rows   = document.querySelectorAll('.tr-course');
+  const groups = document.querySelectorAll('.tr-group');
+
+  rows.forEach(r => {
+    r.style.display = (!q || (r.dataset.name || '').toLowerCase().includes(q)) ? '' : 'none';
+  });
+
+  groups.forEach(g => {
+    let sib = g.nextElementSibling;
+    let anyVisible = false;
+    while (sib && !sib.classList.contains('tr-group')) {
+      if (sib.style.display !== 'none') { anyVisible = true; break; }
+      sib = sib.nextElementSibling;
+    }
+    g.style.display = anyVisible ? '' : 'none';
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  _q = e.target.value;
+  applySearch();
+});
+
+// ── TOOLTIP ───────────────────────────────────────────────
+const TIP = document.getElementById('tip');
+
+function ts(e) {
+  const raw = e.currentTarget.dataset.tip || '';
+  if (!raw) return;
+  const [head, ...rest] = raw.split('\n');
+  TIP.innerHTML = `<span class="tip-head">${head}</span>`
+    + rest.map(l => `<span class="tip-act">${l}</span>`).join('<br>');
+  TIP.classList.add('on');
+  const rx = Math.min(e.clientX + 14, window.innerWidth - 280);
+  const ry = Math.max(e.clientY - 46, 8);
+  TIP.style.left = rx + 'px';
+  TIP.style.top  = ry + 'px';
+}
+function th() { TIP.classList.remove('on'); }
+
+// ── UTILITIES ─────────────────────────────────────────────
+function x(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── LOAD ──────────────────────────────────────────────────
+async function load() {
+  const dot   = document.getElementById('syncDot');
+  const label = document.getElementById('syncLabel');
+  const icon  = document.getElementById('syncRefreshIcon');
+  const chip  = document.getElementById('syncChip');
+
+  dot.className     = 'sync-dot loading';
+  label.textContent = 'Refreshing…';
+  icon.style.display = 'none';
+  chip.disabled = true;
+
+  try {
+    const res = await fetch(CSV_URL, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    const data = processData(rows);
+    const n    = Object.keys(data).length;
+
+    dot.className = 'sync-dot live';
+    const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    label.textContent = `${n} courses · ${t}`;
+    icon.style.display = '';
+
+    render(data);
+  } catch (err) {
+    dot.className = 'sync-dot error';
+    label.textContent = 'Failed – click to retry';
+    icon.style.display = '';
+
+    document.getElementById('ganttScroll').innerHTML = `
+      <div class="state-wrap">
+        <p class="err-head">Couldn’t reach Google Sheets</p>
+        <p class="err-body">
+          Make sure the sheet is published:<br>
+          <strong>File → Share → Publish to web → CSV</strong>
+        </p>
+        <p class="err-code">${x(err.message)}</p>
+      </div>`;
+  } finally {
+    chip.disabled = false;
+  }
+}
+
+load();
+</script>
