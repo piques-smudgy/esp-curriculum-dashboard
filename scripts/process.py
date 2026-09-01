@@ -59,10 +59,10 @@ def parse_courses(text):
 
     if not name_col:
         print(f"WARNING: no course-name column found in {headers}", file=sys.stderr)
-        return {}
+        return None   # None = skip filtering entirely
     if not sm_col:
         print(f"WARNING: no SM column found in {headers}", file=sys.stderr)
-        return {}
+        return None   # None = skip filtering entirely
 
     print(f"Using columns -> name: '{name_col}', sm: '{sm_col}'")
 
@@ -218,6 +218,13 @@ if __name__ == "__main__":
     try:
         courses_text = fetch_csv(COURSES_URL)
         course_sm    = parse_courses(courses_text)
+        if course_sm is None:
+            print("Master sheet columns not recognised — showing all activities, no course filter.")
+        elif len(course_sm) == 0:
+            print("WARNING: master sheet parsed but found 0 courses — disabling filter.", file=sys.stderr)
+            course_sm = None
+        else:
+            print(f"Course whitelist: {sorted(course_sm.keys())[:10]} … ({len(course_sm)} total)")
     except Exception as e:
         print(f"WARNING: could not fetch master courses sheet: {e}", file=sys.stderr)
         print("Continuing without course filter — all activities will be shown.")
