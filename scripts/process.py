@@ -52,10 +52,10 @@ def parse_courses(text):
          if h.strip().lower() in ("course name", "course", "coursename", "name", "vak", "module")),
         None
     )
-    # Find the SM column ("SM 3-yr" as specified in the sheet)
+    # Find the SM column — exact name in the sheet is "SM 3-year"
     sm_col = next(
         (h for h in headers
-         if h.strip().lower() in ("sm 3-yr", "sm 3yr", "sm3-yr", "sm", "semester")),
+         if h.strip().lower() in ("sm 3-year", "sm 3-yr", "sm 3yr", "sm3-yr", "sm", "semester")),
         None
     )
 
@@ -104,17 +104,22 @@ def process(text, course_sm=None):
     data = {}
 
     for row in reader:
-        course  = (row.get("Course") or "").strip()
-        act     = (row.get("ActivityName") or "").strip()
-        aud     = (row.get("AudienceLevel") or "").strip()
-        dtype   = (row.get("DisplayType") or "").strip()
-        cw_raw  = (row.get("CalendarWeek") or "").strip()
-        sm_raw  = (row.get(sm_col, "") or "").strip() if sm_col else ""
+        course    = (row.get("Course") or "").strip()
+        act       = (row.get("ActivityName") or "").strip()
+        aud       = (row.get("AudienceLevel") or "").strip()
+        dtype     = (row.get("DisplayType") or "").strip()
+        cw_raw    = (row.get("CalendarWeek") or "").strip()
+        sm_raw    = (row.get(sm_col, "") or "").strip() if sm_col else ""
+        is_course = (row.get("isCourse") or "").strip().lower()
 
         if not course or aud != "Student" or not cw_raw or cw_raw == "-":
             continue
 
-        # Filter: if we have a whitelist, skip anything not on it
+        # Filter out non-courses (Reps Meetings etc.) using the isCourse flag
+        if is_course in ("false", "0", "no"):
+            continue
+
+        # Additional filter: use master sheet whitelist if available
         if course_sm is not None and course not in course_sm:
             continue
 
