@@ -87,6 +87,18 @@ def parse_courses(text):
 # ── PROCESS ───────────────────────────────────────────────────────────────────
 def process(text, course_sm=None):
     reader = csv.DictReader(StringIO(text))
+    # Normalise fieldnames: strip whitespace and BOM so lookups are reliable
+    if reader.fieldnames:
+        reader.fieldnames = [f.strip().lstrip('﻿') for f in reader.fieldnames]
+    print(f"Activities headers: {reader.fieldnames}")
+
+    # Find the SM column name (case-insensitive fallback)
+    sm_col = next(
+        (h for h in (reader.fieldnames or []) if h.upper() == "SM"),
+        None
+    )
+    print(f"SM column found: {repr(sm_col)}")
+
     data = {}
 
     for row in reader:
@@ -95,7 +107,7 @@ def process(text, course_sm=None):
         aud     = (row.get("AudienceLevel") or "").strip()
         dtype   = (row.get("DisplayType") or "").strip()
         cw_raw  = (row.get("CalendarWeek") or "").strip()
-        sm_raw  = (row.get("SM") or "").strip()
+        sm_raw  = (row.get(sm_col, "") or "").strip() if sm_col else ""
 
         if not course or aud != "Student" or not cw_raw or cw_raw == "-":
             continue
